@@ -23,31 +23,39 @@
                 var line = streamReader.ReadLine();
                 importedLines.Add(line);
             }
-
-            for (int i = 0; i <= importedLines.Count; i++)
+            //string[] values = new string[6];
+            for (int i = 0; i < importedLines.Count; i++)
             {
                 var importedLine = importedLines[i];
                 var values = importedLine.Split(';');
-                var importedObject = new ImportedObject();
-                importedObject.Type = values[0];
-                importedObject.Name = values[1];
-                importedObject.Schema = values[2];
-                importedObject.ParentName = values[3];
-                importedObject.ParentType = values[4];
-                importedObject.DataType = values[5];
-                importedObject.IsNullable = values[6];
+                if (values.Length < 7)
+                {
+                    // Handle the error or skip this line
+                    continue;
+                }
+                var importedObject = new ImportedObject
+                {
+                    Type = values[0],
+                    Name = values[1],
+                    Schema = values[2],
+                    ParentName = values[3],
+                    ParentType = values[4],
+                    DataType = values[5],
+                    IsNullable = values[6]
+                };
                 ((List<ImportedObject>)ImportedObjects).Add(importedObject);
             }
 
             // clear and correct imported data
             foreach (var importedObject in ImportedObjects)
             {
-                importedObject.Type = importedObject.Type.Trim().Replace(" ", "").Replace(Environment.NewLine, "").ToUpper();
-                importedObject.Name = importedObject.Name.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
-                importedObject.Schema = importedObject.Schema.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
-                importedObject.ParentName = importedObject.ParentName.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
-                importedObject.ParentType = importedObject.ParentType.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
+                importedObject.Type = importedObject?.Type?.Replace(" ", "").Replace(Environment.NewLine, "").ToUpper();
+                importedObject.Name = importedObject?.Name?.Replace(" ", "").Replace(Environment.NewLine, "");
+                importedObject.Schema = importedObject?.Schema?.Replace(" ", "").Replace(Environment.NewLine, "");
+                importedObject.ParentName = importedObject?.ParentName?.Replace(" ", "").Replace(Environment.NewLine, "");
+                importedObject.ParentType = importedObject?.ParentType?.Replace(" ", "").Replace(Environment.NewLine, "");
             }
+
 
             // assign number of children
             for (int i = 0; i < ImportedObjects.Count(); i++)
@@ -74,7 +82,7 @@
                     // print all database's tables
                     foreach (var table in ImportedObjects)
                     {
-                        if (table.ParentType.ToUpper() == database.Type)
+                        if (table?.ParentType?.ToUpper() == database.Type)
                         {
                             if (table.ParentName == database.Name)
                             {
@@ -83,7 +91,7 @@
                                 // print all table's columns
                                 foreach (var column in ImportedObjects)
                                 {
-                                    if (column.ParentType.ToUpper() == table.Type)
+                                    if (column.ParentType?.ToUpper() == table.Type)
                                     {
                                         if (column.ParentName == table.Name)
                                         {
